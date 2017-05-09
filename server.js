@@ -61,9 +61,9 @@ io.on('connection', function (socket) {
 		console.log('got a chat message', message);
 
 		socket.broadcast.emit('messageReceived', {
-			emojiID: socket.emojiID,
+			emoji: socket.emojiID,
       message: message,
-			userID: socket.id
+			id: socket.id
 		});
 	});
 

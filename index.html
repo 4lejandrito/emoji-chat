@@ -133,7 +133,7 @@
                 });
 
                 socket.on('disconnected', function (data) {
-                    map.removeEmoji(data.emojiID);
+                    map.removeEmoji(data.emoji);
                 });
 
                 setInterval(function() {
