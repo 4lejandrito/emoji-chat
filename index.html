@@ -79,6 +79,9 @@
                         var emojiElement = this.emojis[emojiShortName];
                         var textElement = emojiElement.querySelector('.message');
                         textElement.innerHTML = text;
+                        setTimeout(function() {
+                            textElement.innerHTML = '';
+                        }, 5000);
                     },
                     removeEmoji(emojiShortName) {
                         this.emojis[emojiShortName].remove();
