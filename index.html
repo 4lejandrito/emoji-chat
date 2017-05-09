@@ -48,8 +48,8 @@
         }
       });
 
-      socket.on('messageReceived', function (msg) {
-        console.log('recieved a message', msg);
+      socket.on('messageReceived', function (data) {
+        console.log('recieved a message', data.msg, 'from', data.userID);
       });
 
      </script>

@@ -37,8 +37,10 @@ io.on('connection', function (socket) {
     console.log('a user disconnected');
   });
 
-  socket.on('chatMessage', function (msg) {
+  socket.on('messageSent', function (msg) {
     console.log('got a chat message', msg);
+
+    socket.broadcast.emit('messageReceived', {msg: msg, userID: socket.id});
   });
 
   socket.on('changeEmoji', function (msg) {
