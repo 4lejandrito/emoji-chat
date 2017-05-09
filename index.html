@@ -141,14 +141,31 @@
 
                 socket.on('moved', function (data) {
                     map.moveEmoji(data.emoji, data.position.x, data.position.y);
+
+
                 });
 
                 socket.on('disconnected', function (data) {
                     map.removeEmoji(data.emoji);
                 });
 
+              socket.on('positionUpdated', function (data) {
+                console.log('positionUpdated', data);
+              })
+
+                var frames = 0;
+
                 requestAnimationFrame(function loop() {
-                    //map.moveEmoji(initialData.you.emoji, speed.dx, speed.dy);
+                    // map.moveEmoji(initialData.you.emoji, speed.dx, speed.dy);
+                    frames++;
+
+                    if (frames % 30 == 0) {
+                      var el = map.emojis[initialData.you.emoji];
+                      var x = el.offsetWidth / factor + (emojiSize * 0.5);
+                      var y = el.offsetHeight / factor + (emojiSize * 0.5);
+                      // socket.emit('positionChanged', {x: x, y: y});
+                    }
+
                     requestAnimationFrame(loop);
                 });
 

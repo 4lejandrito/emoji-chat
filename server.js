@@ -47,6 +47,8 @@ function checkHeight(x) { return check(x, map.height) }
 
 
 function getUserByPosition(x, y) {
+    x = Math.floor(x);
+    y = Math.floor(y);
     for (var i = checkWidth(x - 2); i < checkWidth(x + 2); i++) {
         for (var j = checkHeight(y - 2); j < checkHeight(y + 2); j++) {
             if (userPositions[i][j] !== undefined) {
@@ -138,19 +140,22 @@ io.on('connection', function (socket) {
 
     });
 
-    socket.on('positionChanged', function (postion) {
-        var x = position.x;
-        var y = position.y;
+    socket.on('positionChanged', function (position) {
+        var x = Math.floor(position.x);
+        var y = Math.floor(position.y);
 
         if (getUserByPosition(x, y) !== undefined) {
-            this.emit('positionInvalid');
+            this.emit('positionInvalid', users[userID]);
+            return;
         }
 
-        while (getUserByPosition(x, y) !== undefined) {
-            var x = Math.floor(Math.random() * map.width);
-            var y = Math.floor(Math.random() * map.height);
-        }
+        var current = users[userID].position;
 
-        this.emit('positionUpdated', {x: x, y: y});
+        users[userID].position = position;
+        userPositions[current.x][current.y] = undefined;
+        userPositions[x][y] = users[userID];
+
+        io.emit('positionUpdated', users[userID]);
+
     });
 });
