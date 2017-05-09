@@ -58,6 +58,8 @@
             function createEmoji(shortName) {
                 var el = document.createElement('div');
                 el.innerHTML = emojione.shortnameToUnicode(shortName);
+                el.setAttribute('class', 'emoji');
+                el.setAttribute('data-emoji-shortname', shortName);
                 return el;
             }
 
@@ -70,7 +72,6 @@
             function addEmoji(parent, emojiElement, x, y) {
                 emojiElement.style.top = y + 'px';
                 emojiElement.style.left = x + 'px';
-                emojiElement.setAttribute('class', 'emoji');
                 parent.appendChild(emojiElement);
             }
 
