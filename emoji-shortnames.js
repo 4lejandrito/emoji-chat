@@ -1017,3 +1017,7 @@ var emojiShortnames = [
     ":couple_with_heart_woman_man:",
     ":kiss_woman_man:"
 ];
+
+if (typeof module != 'undefined') {
+    module.exports = emojiShortnames
+}

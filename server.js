@@ -1,7 +1,20 @@
-var app = require('express')();
+var express = require('express');
+var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var express = require('express');
+
+var emojiStore = require('./emoji-memory');
+
+function assignEmoji(userID) {
+  var list = emojiStore.availableEmojis;
+
+  var emojiID = list[Math.floor(Math.random() * list.length)];
+  while (!emojiStore.assignEmojiToUserID(userID, emojiID)) {
+    emojiID = list[Math.floor(Math.random() * list.length)];
+  }
+
+  return emojiID;
+}
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
@@ -15,8 +28,11 @@ http.listen(3000, function(){
 
 io.on('connection', function (socket) {
 
-  io.emit('connected', {id: socket.id});
-
+  var userID = socket.id;
+  var emojiID = assignEmoji(userID);
+  
+  io.emit('connected', {id: userID, emoji: emojiID});
+  
   socket.on('disconnect', function () {
     console.log('a user disconnected');
   });
