@@ -38,7 +38,7 @@ for (var i = 0; i < map.width; i++) {
 
 function check(x, boundary) {
   if (x < 0) return 0;
-  if (x > boundary) return boundary;
+  if (x >= boundary) return boundary - 1;
   return x;
 }
 
@@ -141,18 +141,28 @@ io.on('connection', function (socket) {
     });
 
     socket.on('positionChanged', function (position) {
-        var x = Math.floor(position.x);
+        console.log(position);
+	
+	var x = Math.floor(position.x);
         var y = Math.floor(position.y);
 
-      if (getUserByPosition(x, y, users[userID]) !== undefined) {
+	if (x < 0 || x >= map.width || y < 0 || y > map.height) {
+	    this.emit('positionInvalid', users[userID]);
+            return;
+	}
+
+        if (getUserByPosition(x, y, users[userID]) !== undefined) {
             this.emit('positionInvalid', users[userID]);
             return;
         }
-
+	
         var current = users[userID].position;
 
-        users[userID].position = position;
+	console.log('Current: ', current);
+	
+        users[userID].position = {x: x, y: y};
         userPositions[current.x][current.y] = undefined;
+	console.log('Updating ', x, y)
         userPositions[x][y] = users[userID];
 
         io.emit('positionUpdated', users[userID]);
