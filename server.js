@@ -46,24 +46,24 @@ io.on('connection', function (socket) {
 		console.log('a user disconnected');
 	});
 
-	socket.on('messageSent', function (msg) {
-		console.log('got a chat message', msg);
+	socket.on('messageSent', function (message) {
+		console.log('got a chat message', message);
 
 		socket.broadcast.emit('messageReceived', {
-			msg: msg,
-			userID: socket.id,
-			emojiID: socket.emojiID
+			emojiID: socket.emojiID,
+      message: message,
+			userID: socket.id
 		});
 	});
 
-	socket.on('changeEmoji', function (msg) {
-		// msg	= {emoji: ':tongue:'};
-		if (emojiStore.availableEmojis.indexOf(msg.emoji) === -1) {
+	socket.on('changeEmoji', function (data) {
+		// data	= {emoji: ':tongue:'};
+		if (emojiStore.availableEmojis.indexOf(data.emoji) === -1) {
 			this.emit('emojiNotAvailable');
 			return;
 		}
 
-		var emojiID = emojiStore.assignEmojiToUserID(socket.id, msg.emoji);
+		var emojiID = emojiStore.assignEmojiToUserID(socket.id, data.emoji);
 		if (emojiID === false) {
 			this.emit('emojiAlreadyInUse');
 			return;

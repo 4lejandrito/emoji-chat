@@ -39,8 +39,8 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
       var socket = io();
-      socket.on('connected', function (msg) {
-        console.log('you are connected!', msg);
+      socket.on('connected', function (data) {
+        console.log('you are connected!', data);
       });
 
       var msgInput = document.getElementById('msg-input');
@@ -52,7 +52,10 @@
       });
 
       socket.on('messageReceived', function (data) {
-        console.log('recieved a message', data.msg, 'from', data.userID);
+        console.log('recieved a message',
+          data.message,
+          'from', data.userID,
+          '(emoji: ', data.emojiID, ')');
       });
 
      </script>
