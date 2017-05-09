@@ -30,9 +30,9 @@ io.on('connection', function (socket) {
 
   var userID = socket.id;
   var emojiID = assignEmoji(userID);
-  
+
   io.emit('connected', {id: userID, emoji: emojiID});
-  
+
   socket.on('disconnect', function () {
     console.log('a user disconnected');
   });
@@ -41,4 +41,21 @@ io.on('connection', function (socket) {
     console.log('got a chat message', msg);
   });
 
+  socket.on('changeEmoji', function (msg) {
+    // msg  = {emoji: ':tongue:'};
+    if (emojiStore.availableEmojis.indexOf(msg.emoji) === -1) {
+      this.emit('emojiNotAvailable');
+      return;
+    }
+
+    var emojiID = emojiStore.assignEmojiToUserID(socket.id, msg.emoji);
+    if (emojiID === false) {
+      this.emit('emojiAlreadyInUse');
+      return;
+    }
+
+    this.emit('emojiChanged', {emoji: emojiID});
+
+
+  });
 });

@@ -1,4 +1,3 @@
-module.exports = emojiStore
 
 var emojiShortnames = require('./emoji-shortnames');
 
@@ -9,13 +8,13 @@ var emojiStore = {
   getEmojiByUserId: function(userID) {
     return emojisByUserId[userID];
   },
-  
+
   getUserIdByEmoji: function(emojiID) {
     return userIdByEmojis[emojiID];
   },
-  
+
   assignEmojiToUserID: function(userID, emojiID) {
-    if (getUserIdByEmoji[selection] !== null) {
+    if (userIdByEmojis[emojiID] !== null) {
       emojisByUserId[userID] = emojiID;
       userIdByEmojis[emojiID] = userID;
       return true;
@@ -25,5 +24,7 @@ var emojiStore = {
   },
 
   availableEmojis: emojiShortnames
-  
+
 }
+
+module.exports = emojiStore;
