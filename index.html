@@ -28,113 +28,105 @@
   </head>
 
   <body>
-    <div id="map" class="width-100 height-95 border" id="messages" width="100%"></div>
+    <div id="map" class="width-100 height-95 border" id="messages" width="100%">
+        Connecting to the server...
+    </div>
     <input id="input" autofocus class="width-100 height-20 padding-5 bigger" type="text" placeholder="Enter your message">
 
 
     <script src="/socket.io/socket.io.js"></script>
-    <script>
-      var socket = io();
-      socket.on('connected', function (data) {
-        console.log('you are connected!', data);
-      });
-
-      var msgInput = document.getElementById('input');
-      msgInput.addEventListener('change', function (e) {
-        if (msgInput.value.length > 0) {
-          socket.emit('messageSent', msgInput.value);
-          msgInput.value = '';
-        }
-      });
-
-      socket.on('messageReceived', function (data) {
-        console.log('recieved a message',
-          data.message,
-          'from', data.userID,
-          '(emoji: ', data.emojiID, ')');
-      });
-
-     </script>
-
     <script type="text/javascript">
         (function() {
-            var mapElement = document.getElementById('map');
-            var inputElement = document.getElementById('input');
-
-            var map = {
-                element: mapElement,
-                emojis: {},
-                addEmoji: function(emojiShortName, x, y) {
-                    var emojiElement = document.createElement('div');
-                    emojiElement.innerHTML = emojione.shortnameToUnicode(emojiShortName);
-                    emojiElement.setAttribute('class', 'emoji');
-                    emojiElement.setAttribute('data-emoji-shortname', emojiShortName);
-                    emojiElement.style.left = x + 'px';
-                    emojiElement.style.top = y + 'px';
-                    this.element.appendChild(emojiElement);
-                    this.emojis[emojiShortName] = emojiElement;
-                },
-                moveEmoji(emojiShortName, dx, dy) {
-                    var emojiElement = this.emojis[emojiShortName];
-                    emojiElement.style.left = (emojiElement.offsetLeft + dx) + 'px';
-                    emojiElement.style.top = (emojiElement.offsetTop + dy) + 'px';
-                }
-            };
-
             function randomBetween(min, max) {
                 return Math.floor(Math.random()*(max-min+1)+min);
             }
 
-            var speed = {dx: 0, dy: 0};
+            var socket = io();
+            socket.on('connected', function (data) {
+                var speed = {dx: 0, dy: 0};
+                var mapElement = document.getElementById('map');
+                var inputElement = document.getElementById('input');
+                var map = {
+                    element: mapElement,
+                    emojis: {},
+                    addEmoji: function(emojiShortName, x, y) {
+                        var emojiElement = document.createElement('div');
+                        emojiElement.innerHTML = emojione.shortnameToUnicode(emojiShortName);
+                        emojiElement.setAttribute('class', 'emoji');
+                        emojiElement.setAttribute('data-emoji-shortname', emojiShortName);
+                        emojiElement.style.left = x + 'px';
+                        emojiElement.style.top = y + 'px';
+                        this.element.appendChild(emojiElement);
+                        this.emojis[emojiShortName] = emojiElement;
+                    },
+                    moveEmoji(emojiShortName, dx, dy) {
+                        var emojiElement = this.emojis[emojiShortName];
+                        emojiElement.style.left = (emojiElement.offsetLeft + dx) + 'px';
+                        emojiElement.style.top = (emojiElement.offsetTop + dy) + 'px';
+                    }
+                };
 
-            inputElement.onkeydown = function(e) {
-                e = e || window.event;
+                mapElement.innerHTML = '';
 
-                if (e.keyCode == '38') {
-                    speed.dy = -2;
-                }
-                else if (e.keyCode == '40') {
-                    speed.dy = +2;
-                }
-                else if (e.keyCode == '37') {
-                   speed.dx = -2;
-                }
-                else if (e.keyCode == '39') {
-                   speed.dx = +2;
-                }
-                map.moveEmoji(':smile:', speed.dx, speed.dy);
-            }
+                inputElement.onkeydown = function(e) {
+                    e = e || window.event;
 
-            inputElement.onkeyup = function(e) {
-                e = e || window.event;
+                    if (e.keyCode == '38') {
+                        speed.dy = -2;
+                    }
+                    else if (e.keyCode == '40') {
+                        speed.dy = +2;
+                    }
+                    else if (e.keyCode == '37') {
+                       speed.dx = -2;
+                    }
+                    else if (e.keyCode == '39') {
+                       speed.dx = +2;
+                    }
+                }
 
-                if (e.keyCode == '38') {
-                    speed.dy = 0;
-                }
-                else if (e.keyCode == '40') {
-                    speed.dy = 0;
-                }
-                else if (e.keyCode == '37') {
-                   speed.dx = 0;
-                }
-                else if (e.keyCode == '39') {
-                   speed.dx = 0;
-                }
-            }
+                inputElement.onkeyup = function(e) {
+                    e = e || window.event;
 
-            window.requestIdleCallback(function() {
-                speed.dx = speed.dy = 0;
+                    if (e.keyCode == '38') {
+                        speed.dy = 0;
+                    }
+                    else if (e.keyCode == '40') {
+                        speed.dy = 0;
+                    }
+                    else if (e.keyCode == '37') {
+                       speed.dx = 0;
+                    }
+                    else if (e.keyCode == '39') {
+                       speed.dx = 0;
+                    }
+                }
+
+                map.addEmoji(
+                    data.emoji,
+                    data.position.x * mapElement.offsetWidth / 100,
+                    data.position.y * mapElement.offsetHeight / 100
+                );
+
+                setInterval(function() {
+                    map.moveEmoji(data.emoji, speed.dx, speed.dy);
+                }, 20);
             });
 
-            setInterval(function() {
-                map.moveEmoji(':smile:', speed.dx, speed.dy);
-            }, 60);
-
-            map.addEmoji(
-                ':smile:',
-                randomBetween(0, mapElement.offsetWidth),
-                randomBetween(0, mapElement.offsetHeight)
-            );
+            // var msgInput = document.getElementById('input');
+            // msgInput.addEventListener('change', function (e) {
+            //   if (msgInput.value.length > 0) {
+            //     socket.emit('messageSent', msgInput.value);
+            //     msgInput.value = '';
+            //   }
+            // });
+            //
+            // socket.on('messageReceived', function (data) {
+            //   console.log('recieved a message',
+            //     data.message,
+            //     'from', data.userID,
+            //     '(emoji: ', data.emojiID, ')');
+            // });
         }());
     </script>
   </body>
