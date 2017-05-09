@@ -2,6 +2,7 @@
 <html>
   <head>
 
+    <meta charset="utf-8">
     <style>
     body,html{margin:0;width:100%;height:100%;overflow:hidden}
     .width-100{width:100%}
@@ -11,12 +12,9 @@
     .border{border:1px solid #000}
     #map {
         position: relative;
-        font-size: 40px;
     }
     .emoji {
         position: absolute;
-        overflow: hidden;
-        text-align: center;
     }
     .bigger {
       font-size: 1.2em;
@@ -45,13 +43,18 @@
                 var map = {
                     element: mapElement,
                     emojis: {},
-                    addEmoji: function(emojiShortName, x, y) {
+                    addEmoji: function(emojiShortName, centerX, centerY) {
                         var emojiElement = document.createElement('div');
-                        emojiElement.innerHTML = emojione.shortnameToUnicode(emojiShortName);
+                        emojiElement.innerHTML = emojione.shortnameToImage(emojiShortName);
                         emojiElement.setAttribute('class', 'emoji');
+                        emojiElement.setAttribute('title', centerX + ', ' + centerY);
                         emojiElement.setAttribute('data-emoji-shortname', emojiShortName);
-                        emojiElement.style.left = x + 'px';
-                        emojiElement.style.top = y + 'px';
+                        var emojiSize = this.element.offsetWidth / 30;
+                        var factor = this.element.offsetWidth / 40;
+                        emojiElement.style.width = emojiSize + 'px';
+                        emojiElement.style.height = emojiSize + 'px';
+                        emojiElement.style.left = (centerX * factor - emojiSize / 2) + 'px';
+                        emojiElement.style.top = (centerY * factor - emojiSize / 2) + 'px';
                         this.element.appendChild(emojiElement);
                         this.emojis[emojiShortName] = emojiElement;
                     },
@@ -136,14 +139,13 @@
                 });
 
                 setInterval(function() {
-                    map.moveEmoji(initialData.emoji, speed.dx, speed.dy);
+                    //map.moveEmoji(initialData.emoji, speed.dx, speed.dy);
                 }, 20);
 
-                map.addEmoji(
-                    initialData.emoji,
-                    initialData.position.x * mapElement.offsetWidth / 100,
-                    initialData.position.y * mapElement.offsetHeight / 100
-                );
+                for (var userId in initialData.users) {
+                    var user = initialData.users[userId];
+                    map.addEmoji(user.emoji, user.position.x, user.position.y);
+                }
             });
         }());
     </script>
