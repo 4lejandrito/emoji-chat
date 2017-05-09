@@ -6,34 +6,34 @@ var io = require('socket.io')(http);
 var emojiStore = require('./emoji-memory');
 
 var map = {
-  width:  1000,
-  height: 1000
+    width:  50,
+    height: 50
 };
 
 function assignEmoji(userID) {
-	var list = emojiStore.availableEmojis;
+    var list = emojiStore.availableEmojis;
 
-	var emojiID = list[Math.floor(Math.random() * list.length)];
-	while (!emojiStore.assignEmojiToUserID(userID, emojiID)) {
-		emojiID = list[Math.floor(Math.random() * list.length)];
-	}
+    var emojiID = list[Math.floor(Math.random() * list.length)];
+    while (!emojiStore.assignEmojiToUserID(userID, emojiID)) {
+        emojiID = list[Math.floor(Math.random() * list.length)];
+    }
 
-	return emojiID;
+    return emojiID;
 }
 
 app.get('/', function(req, res){
-	res.sendFile(__dirname + '/index.html');
+    res.sendFile(__dirname + '/index.html');
 });
 
 app.use(express.static(__dirname));
 
 http.listen(3000, function(){
-	console.log('listening on *:3000');
+    console.log('listening on *:3000');
 });
 
 var userPositions = [];
 for (var i = 0; i < map.width; i++) {
-  userPositions[i] = [];
+    userPositions[i] = [];
 }
 
 function check(x, boundary) {
@@ -47,85 +47,106 @@ function checkHeight(x) { return check(x, map.height) }
 
 
 function getUserByPosition(x, y) {
-  for (var i = checkWidth(x - 2); i < checkWidth(x + 2); i++) {
-    for (var j = checkHeight(y - 2); j < checkHeight(y + 2); j++) {
-      if (userPositions[i][j] !== undefined) {
-        return userPositions[i][j];
-      }
+    for (var i = checkWidth(x - 2); i < checkWidth(x + 2); i++) {
+        for (var j = checkHeight(y - 2); j < checkHeight(y + 2); j++) {
+            if (userPositions[i][j] !== undefined) {
+                return userPositions[i][j];
+            }
+        }
     }
-  }
 
 }
 
 function getUserInitialPosition() {
-  var x = Math.floor(Math.random() * map.width);
-  var y = Math.floor(Math.random() * map.height);
-  while (getUserByPosition(x, y) !== undefined) {
     var x = Math.floor(Math.random() * map.width);
     var y = Math.floor(Math.random() * map.height);
-  }
+    while (getUserByPosition(x, y) !== undefined) {
+        var x = Math.floor(Math.random() * map.width);
+        var y = Math.floor(Math.random() * map.height);
+    }
 
-  return {x: x, y:  y};
+
+    return {x: x, y:  y};
 }
 
 var users = {};
 
 io.on('connection', function (socket) {
 
-	var userID = socket.id;
-	var emojiID = assignEmoji(userID);
-	socket.emojiID = emojiID;
+    var userID = socket.id;
+    var emojiID = assignEmoji(userID);
+    socket.emojiID = emojiID;
 
-  users[userID] = {
+    var position = getUserInitialPosition();
 
-    id: userID,
-    emoji: emojiID,
-    position: getUserInitialPosition()
-  };
+    users[userID] = {
 
-  io.emit('initialMessage', {
-    you: users[userID],
-    users: users
-  });
+        id: userID,
+        emoji: emojiID,
+        position: position,
+    };
+    userPositions[position.x][position.y] = users[userID];
 
-	socket.broadcast.emit('connected', {
-		id: userID,
-		emoji: emojiID,
-		position: getUserInitialPosition()
-  });
 
-	socket.on('disconnect', function () {
+    io.emit('initialMessage', {
+        you: users[userID],
+        users: users
+    });
+
+    socket.broadcast.emit('connected', {
+        id: userID,
+        emoji: emojiID,
+        position: getUserInitialPosition()
+    });
+
+    socket.on('disconnect', function () {
         io.emit('disconnected', {
-    		id: userID,
-    		emoji: emojiID
-    	});
-	});
+            id: userID,
+            emoji: emojiID
+        });
+    });
 
-	socket.on('messageSent', function (message) {
-		console.log('got a chat message', message);
+    socket.on('messageSent', function (message) {
+        console.log('got a chat message', message);
 
-		socket.broadcast.emit('messageReceived', {
-			emoji: socket.emojiID,
-      message: message,
-			id: socket.id
-		});
-	});
+        socket.broadcast.emit('messageReceived', {
+            emoji: socket.emojiID,
+            message: message,
+            id: socket.id
+        });
+    });
 
-	socket.on('changeEmoji', function (data) {
-		// data	= {emoji: ':tongue:'};
-		if (emojiStore.availableEmojis.indexOf(data.emoji) === -1) {
-			this.emit('emojiNotAvailable');
-			return;
-		}
+    socket.on('changeEmoji', function (data) {
+        // data = {emoji: ':tongue:'};
+        if (emojiStore.availableEmojis.indexOf(data.emoji) === -1) {
+            this.emit('emojiNotAvailable');
+            return;
+        }
 
-		var emojiID = emojiStore.assignEmojiToUserID(socket.id, data.emoji);
-		if (emojiID === false) {
-			this.emit('emojiAlreadyInUse');
-			return;
-		}
+        var emojiID = emojiStore.assignEmojiToUserID(socket.id, data.emoji);
+        if (emojiID === false) {
+            this.emit('emojiAlreadyInUse');
+            return;
+        }
 
-		this.emit('emojiChanged', {emoji: emojiID});
+        this.emit('emojiChanged', {emoji: emojiID});
 
 
-	});
+    });
+
+    socket.on('positionChanged', function (postion) {
+        var x = position.x;
+        var y = position.y;
+
+        if (getUserByPosition(x, y) !== undefined) {
+            this.emit('positionInvalid');
+        }
+
+        while (getUserByPosition(x, y) !== undefined) {
+            var x = Math.floor(Math.random() * map.width);
+            var y = Math.floor(Math.random() * map.height);
+        }
+
+        this.emit('positionUpdated', {x: x, y: y});
+    });
 });
