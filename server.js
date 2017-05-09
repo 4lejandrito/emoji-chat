@@ -42,7 +42,10 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('disconnect', function () {
-		console.log('a user disconnected');
+        io.emit('disconnected', {
+    		id: userID,
+    		emoji: emojiID
+    	});
 	});
 
 	socket.on('messageSent', function (message) {

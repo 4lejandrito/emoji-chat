@@ -66,6 +66,10 @@
                         textElement.innerHTML = text;
                         textElement.setAttribute('class', 'message');
                         emojiElement.appendChild(textElement);
+                    },
+                    removeEmoji(emojiShortName) {
+                        this.emojis[emojiShortName].remove();
+                        delete this.emojis[emojiShortName];
                     }
                 };
 
@@ -113,6 +117,10 @@
 
                 socket.on('messageReceived', function (data) {
                     map.sayEmoji(data.emojiID, data.message);
+                });
+
+                socket.on('disconnected', function (data) {
+                    map.removeEmoji(data.emojiID);
                 });
 
                 setInterval(function() {
