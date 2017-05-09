@@ -59,7 +59,7 @@
                 var mapElement = document.getElementById('map');
                 var inputElement = document.getElementById('input');
                 var emojiSize = mapElement.offsetWidth / 30;
-                var factor = mapElement.offsetWidth / 40;
+                var factor = mapElement.offsetWidth / 50;
 
                 function getPosition(x) {
                     return (x * factor - emojiSize / 2);
@@ -175,10 +175,10 @@
                 requestAnimationFrame(function loop() {
                     frames++;
 
-                    if (frames % 30 == 0 && (speed.dx || speed.dy)) {
+                    if (frames % 10 == 0 && (speed.dx || speed.dy)) {
                       var el = map.emojis[initialData.you.emoji];
-                      var x = el.offsetLeft / factor + (emojiSize * 0.5);
-                      var y = el.offsetTop / factor + (emojiSize * 0.5);
+                      var x = (el.offsetLeft + (emojiSize * 0.5)) / factor;
+                      var y = (el.offsetTop + (emojiSize * 0.5)) / factor;
                       socket.emit('positionChanged', {x: x, y: y});
                     }
                     map.moveEmoji(initialData.you.emoji, speed.dx, speed.dy);
