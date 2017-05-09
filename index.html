@@ -16,6 +16,10 @@
     .emoji {
         position: absolute;
     }
+    .emoji img {
+        width: 100%;
+        height: 100%;
+    }
     .bigger {
       font-size: 1.2em;
     }
@@ -113,7 +117,7 @@
                 }
 
                 inputElement.addEventListener('change', function(e) {
-                    map.sayEmoji(data.emoji, inputElement.value);
+                    map.sayEmoji(initialData.you.emoji, inputElement.value);
                     socket.emit('messageSent', inputElement.value);
                     inputElement.value = '';
                 });
@@ -138,9 +142,10 @@
                     map.removeEmoji(data.emoji);
                 });
 
-                setInterval(function() {
-                    //map.moveEmoji(initialData.emoji, speed.dx, speed.dy);
-                }, 20);
+                requestAnimationFrame(function loop() {
+                    map.moveEmoji(initialData.you.emoji, speed.dx, speed.dy);
+                    requestAnimationFrame(loop);
+                });
 
                 for (var userId in initialData.users) {
                     var user = initialData.users[userId];
