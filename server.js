@@ -4,6 +4,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 var emojiStore = require('./emoji-memory');
+var map = require('./map');
 
 function assignEmoji(userID) {
   var list = emojiStore.availableEmojis;
@@ -30,8 +31,16 @@ io.on('connection', function (socket) {
 
   var userID = socket.id;
   var emojiID = assignEmoji(userID);
+  socket.emojiID = emojiID;
 
-  io.emit('connected', {id: userID, emoji: emojiID});
+  io.emit('connected', {
+    id: userID,
+    emoji: emojiID,
+    position: {
+      x: Math.random() * map.width,
+      y: Math.random() * map.height
+    }
+  });
 
   socket.on('disconnect', function () {
     console.log('a user disconnected');
@@ -40,7 +49,11 @@ io.on('connection', function (socket) {
   socket.on('messageSent', function (msg) {
     console.log('got a chat message', msg);
 
-    socket.broadcast.emit('messageReceived', {msg: msg, userID: socket.id});
+    socket.broadcast.emit('messageReceived', {
+      msg: msg,
+      userID: socket.id,
+      emojiID: socket.emojiID
+    });
   });
 
   socket.on('changeEmoji', function (msg) {
