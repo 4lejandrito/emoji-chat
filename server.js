@@ -4,7 +4,6 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 var emojiStore = require('./emoji-memory');
-var map = require('./map');
 
 function assignEmoji(userID) {
 	var list = emojiStore.availableEmojis;
@@ -37,8 +36,8 @@ io.on('connection', function (socket) {
 		id: userID,
 		emoji: emojiID,
 		position: {
-			x: Math.random() * map.width,
-			y: Math.random() * map.height
+			x: Math.random() * 100,
+			y: Math.random() * 100
 		}
 	});
 
