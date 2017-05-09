@@ -89,6 +89,11 @@
                         emojiElement.style.left = (emojiElement.offsetLeft + dx) + 'px';
                         emojiElement.style.top = (emojiElement.offsetTop + dy) + 'px';
                     },
+                    setEmojiPosition(emojiShortName, centerX, centerY) {
+                        var emojiElement = this.emojis[emojiShortName];
+                        emojiElement.style.left = getPosition(centerX) + 'px';
+                        emojiElement.style.top = getPosition(centerY) + 'px';
+                    },
                     sayEmoji: function(emojiShortName, text) {
                         var emojiElement = this.emojis[emojiShortName];
                         var textElement = emojiElement.querySelector('.message');
@@ -157,19 +162,13 @@
                     );
                 });
 
-                socket.on('moved', function (data) {
-                    map.moveEmoji(data.emoji, data.position.x, data.position.y);
-
-
-                });
-
                 socket.on('disconnected', function (data) {
                     map.removeEmoji(data.emoji);
                 });
 
-              socket.on('positionUpdated', function (data) {
-                console.log('positionUpdated', data);
-              })
+                socket.on('positionUpdated', function (data) {
+                    map.setEmojiPosition(data.emoji, data.position.x, data.position.y);
+                });
 
                 var frames = 0;
 
