@@ -165,7 +165,7 @@ io.on('connection', function (socket) {
 	console.log('Updating ', x, y)
         userPositions[x][y] = users[userID];
 
-        this.emit('positionUpdated', users[userID]);
+        //this.emit('positionUpdated', users[userID]);
 	socket.broadcast.emit('positionUpdated', users[userID]);
     });
 });
