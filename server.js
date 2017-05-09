@@ -32,7 +32,16 @@ io.on('connection', function (socket) {
 	var emojiID = assignEmoji(userID);
 	socket.emojiID = emojiID;
 
-	io.emit('connected', {
+    io.emit('initialMessage', {
+        id: userID,
+        emoji: emojiID,
+        position: {
+            x: Math.random() * 100,
+            y: Math.random() * 100
+        }
+    });
+
+	socket.broadcast.emit('connected', {
 		id: userID,
 		emoji: emojiID,
 		position: {
