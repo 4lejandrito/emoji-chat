@@ -128,6 +128,10 @@
                     );
                 });
 
+                socket.on('moved', function (data) {
+                    map.moveEmoji(data.emoji, data.position.x, data.position.y);
+                });
+
                 socket.on('disconnected', function (data) {
                     map.removeEmoji(data.emojiID);
                 });
