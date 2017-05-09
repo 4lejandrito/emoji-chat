@@ -5,6 +5,11 @@ var io = require('socket.io')(http);
 
 var emojiStore = require('./emoji-memory');
 
+var map = {
+  width:  1000,
+  height: 1000
+};
+
 function assignEmoji(userID) {
 	var list = emojiStore.availableEmojis;
 
@@ -26,29 +31,68 @@ http.listen(3000, function(){
 	console.log('listening on *:3000');
 });
 
+var userPositions = [];
+for (var i = 0; i < map.width; i++) {
+  userPositions[i] = [];
+}
+
+function check(boundary, x) {
+  if (x < 0) return 0;
+  if (x > boundary) return boundary;
+  return x;
+}
+
+function checkWidth(x) { return check(x, map.width) }
+function checkHeight(x) { return check(x, map.height) }
+
+
+function getUserByPosition(x, y) {
+  for (var i = checkWidth(x - 2); i < checkWidth(x + 2); i++) {
+    for (var j = checkHeight(y - 2); j < checkHeight(y + 2); j++) {
+      if (userPositions[i][j] !== undefined) {
+        return userPositions[i][j];
+      }
+    }
+  }
+
+}
+
+function getUserInitialPosition() {
+  var x = Math.floor(Math.random() * map.width);
+  var y = Math.floor(Math.random() * map.height);
+  while (getUserByPosition(x, y) !== undefined) {
+    var x = Math.floor(Math.random() * map.width);
+    var y = Math.floor(Math.random() * map.height);
+  }
+
+  return {x: x, y:  y};
+}
+
+var users = {};
+
 io.on('connection', function (socket) {
 
 	var userID = socket.id;
 	var emojiID = assignEmoji(userID);
 	socket.emojiID = emojiID;
 
-    io.emit('initialMessage', {
-        id: userID,
-        emoji: emojiID,
-        position: {
-            x: Math.random() * 100,
-            y: Math.random() * 100
-        }
-    });
+  users[userID] = {
+
+    id: userID,
+    emoji: emojiID,
+    position: getUserInitialPosition()
+  };
+
+  io.emit('initialMessage', {
+    you: users[userID],
+    users: users
+  });
 
 	socket.broadcast.emit('connected', {
 		id: userID,
 		emoji: emojiID,
-		position: {
-			x: Math.random() * 100,
-			y: Math.random() * 100
-		}
-	});
+		position: getUserInitialPosition()
+  });
 
 	socket.on('disconnect', function () {
         io.emit('disconnected', {
