@@ -44,6 +44,13 @@
                 var speed = {dx: 0, dy: 0};
                 var mapElement = document.getElementById('map');
                 var inputElement = document.getElementById('input');
+                var emojiSize = mapElement.offsetWidth / 30;
+                var factor = mapElement.offsetWidth / 40;
+
+                function getPosition(x) {
+                    return (x * factor - emojiSize / 2);
+                }
+
                 var map = {
                     element: mapElement,
                     emojis: {},
@@ -53,12 +60,10 @@
                         emojiElement.setAttribute('class', 'emoji');
                         emojiElement.setAttribute('title', centerX + ', ' + centerY);
                         emojiElement.setAttribute('data-emoji-shortname', emojiShortName);
-                        var emojiSize = this.element.offsetWidth / 30;
-                        var factor = this.element.offsetWidth / 40;
                         emojiElement.style.width = emojiSize + 'px';
                         emojiElement.style.height = emojiSize + 'px';
-                        emojiElement.style.left = (centerX * factor - emojiSize / 2) + 'px';
-                        emojiElement.style.top = (centerY * factor - emojiSize / 2) + 'px';
+                        emojiElement.style.left = getPosition(centerX) + 'px';
+                        emojiElement.style.top = getPosition(centerY) + 'px';
                         this.element.appendChild(emojiElement);
                         this.emojis[emojiShortName] = emojiElement;
                     },
@@ -129,8 +134,8 @@
                 socket.on('connected', function (data) {
                     map.addEmoji(
                         data.emoji,
-                        data.position.x * mapElement.offsetWidth / 100,
-                        data.position.y * mapElement.offsetHeight / 100
+                        data.position.x,
+                        data.position.y
                     );
                 });
 
@@ -143,13 +148,17 @@
                 });
 
                 requestAnimationFrame(function loop() {
-                    map.moveEmoji(initialData.you.emoji, speed.dx, speed.dy);
+                    //map.moveEmoji(initialData.you.emoji, speed.dx, speed.dy);
                     requestAnimationFrame(loop);
                 });
 
                 for (var userId in initialData.users) {
                     var user = initialData.users[userId];
-                    map.addEmoji(user.emoji, user.position.x, user.position.y);
+                    map.addEmoji(
+                        user.emoji,
+                        user.position.x,
+                        user.position.y
+                    );
                 }
             });
         }());

@@ -7,7 +7,7 @@ var emojiStore = require('./emoji-memory');
 
 var map = {
     width:  50,
-    height: 50
+    height: 20
 };
 
 function assignEmoji(userID) {
@@ -88,7 +88,7 @@ io.on('connection', function (socket) {
     userPositions[position.x][position.y] = users[userID];
 
 
-    io.emit('initialMessage', {
+    socket.emit('initialMessage', {
         you: users[userID],
         users: users
     });
@@ -96,7 +96,7 @@ io.on('connection', function (socket) {
     socket.broadcast.emit('connected', {
         id: userID,
         emoji: emojiID,
-        position: getUserInitialPosition()
+        position: position
     });
 
     socket.on('disconnect', function () {
