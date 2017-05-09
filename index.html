@@ -43,8 +43,13 @@
       var msgInput = document.getElementById('msg-input');
       msgInput.addEventListener('change', function (e) {
         if (msgInput.value.length > 0) {
-          socket.emit('chatMessage', msgInput.value);
+          socket.emit('messageSent', msgInput.value);
+          msgInput.value = '';
         }
+      });
+
+      socket.on('messageReceived', function (msg) {
+        console.log('recieved a message', msg);
       });
 
      </script>
