@@ -9,11 +9,27 @@
     .height-5{height:5%}
     .padding-5{padding:5 0 5 0}
     .border{border:1px solid #000}
+    #map {
+        position: relative;
+        font-size: 40px;
+    }
+    .emoji {
+        position: absolute;
+        font-size: 35px;
+        overflow: hidden;
+        text-align: center;
+        border: solid 1px #dddddd;
+        border-radius: 2px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    }
     </style>
+
+    <script src="https://cdn.jsdelivr.net/emojione/3.0.3/lib/js/emojione.min.js"></script>
+    <script src="emoji-shortnames.js"></script>
   </head>
 
   <body>
-    <div class="width-100 height-95 border" id="messages" width="100%"></div>
+    <div id="map" class="width-100 height-95 border" id="messages" width="100%"></div>
     <input class="width-100 height-20 padding-5" type="text" id="msg-input" placeholder="Enter your message">
 
 
@@ -31,6 +47,44 @@
         }
       });
 
+     </script>
+
+    <script type="text/javascript">
+        (function() {
+            function randomBetween(min, max) {
+                return Math.floor(Math.random()*(max-min+1)+min);
+            }
+
+            function createEmoji(shortName) {
+                var el = document.createElement('div');
+                el.innerHTML = emojione.shortnameToUnicode(shortName);
+                return el;
+            }
+
+            function createRandomEmoji() {
+                return createEmoji(
+                    emojiShortnames[randomBetween(0, emojiShortnames.length)]
+                );
+            }
+
+            function addEmoji(parent, emojiElement, x, y) {
+                emojiElement.style.top = y + 'px';
+                emojiElement.style.left = x + 'px';
+                emojiElement.setAttribute('class', 'emoji');
+                parent.appendChild(emojiElement);
+            }
+
+            var parent = document.getElementById('map');
+
+            for (var i = 0; i < 30; i++) {
+                addEmoji(
+                    parent,
+                    createRandomEmoji(),
+                    randomBetween(0, parent.offsetWidth),
+                    randomBetween(0, parent.offsetHeight)
+                );
+            }
+        }());
     </script>
   </body>
 </html>
