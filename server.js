@@ -46,12 +46,12 @@ function checkWidth(x) { return check(x, map.width) }
 function checkHeight(x) { return check(x, map.height) }
 
 
-function getUserByPosition(x, y) {
+function getUserByPosition(x, y, current) {
     x = Math.floor(x);
     y = Math.floor(y);
     for (var i = checkWidth(x - 2); i < checkWidth(x + 2); i++) {
         for (var j = checkHeight(y - 2); j < checkHeight(y + 2); j++) {
-            if (userPositions[i][j] !== undefined) {
+            if (userPositions[i][j] !== undefined && userPositions[i][j] !== current) {
                 return userPositions[i][j];
             }
         }
@@ -62,7 +62,7 @@ function getUserByPosition(x, y) {
 function getUserInitialPosition() {
     var x = Math.floor(Math.random() * map.width);
     var y = Math.floor(Math.random() * map.height);
-    while (getUserByPosition(x, y) !== undefined) {
+    while (getUserByPosition(x, y, {}) !== undefined) {
         var x = Math.floor(Math.random() * map.width);
         var y = Math.floor(Math.random() * map.height);
     }
@@ -144,7 +144,7 @@ io.on('connection', function (socket) {
         var x = Math.floor(position.x);
         var y = Math.floor(position.y);
 
-        if (getUserByPosition(x, y) !== undefined) {
+      if (getUserByPosition(x, y, users[userID]) !== undefined) {
             this.emit('positionInvalid', users[userID]);
             return;
         }
