@@ -897,7 +897,6 @@ var emojiShortnames = [
     ":woman_getting_face_massage_tone3:",
     ":woman_getting_face_massage_tone2:",
     ":woman_getting_face_massage_tone1:",
-    ":levitate:",
     ":man_in_business_suit_levitating_tone1:",
     ":man_in_business_suit_levitating_tone2:",
     ":man_in_business_suit_levitating_tone3:",
