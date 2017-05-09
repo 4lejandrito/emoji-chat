@@ -100,6 +100,10 @@ io.on('connection', function (socket) {
     });
 
     socket.on('disconnect', function () {
+        var position = users[userID].position;
+        userPositions[position.x][position.y] = null;
+        delete users[userID];
+
         io.emit('disconnected', {
             id: userID,
             emoji: emojiID
