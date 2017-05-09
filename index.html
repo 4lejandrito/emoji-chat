@@ -38,7 +38,7 @@
         (function() {
             localStorage.debug = '*';
             var socket = io();
-            socket.on('initialMessage', function (data) {
+            socket.on('initialMessage', function (initialData) {
                 var speed = {dx: 0, dy: 0};
                 var mapElement = document.getElementById('map');
                 var inputElement = document.getElementById('input');
@@ -116,7 +116,7 @@
                 });
 
                 socket.on('messageReceived', function (data) {
-                    map.sayEmoji(data.emojiID, data.message);
+                    map.sayEmoji(data.emoji, data.message);
                 });
 
                 socket.on('connected', function (data) {
@@ -136,13 +136,13 @@
                 });
 
                 setInterval(function() {
-                    map.moveEmoji(data.emoji, speed.dx, speed.dy);
+                    map.moveEmoji(initialData.emoji, speed.dx, speed.dy);
                 }, 20);
 
                 map.addEmoji(
-                    data.emoji,
-                    data.position.x * mapElement.offsetWidth / 100,
-                    data.position.y * mapElement.offsetHeight / 100
+                    initialData.emoji,
+                    initialData.position.x * mapElement.offsetWidth / 100,
+                    initialData.position.y * mapElement.offsetHeight / 100
                 );
             });
         }());
