@@ -36,7 +36,7 @@ for (var i = 0; i < map.width; i++) {
   userPositions[i] = [];
 }
 
-function check(boundary, x) {
+function check(x, boundary) {
   if (x < 0) return 0;
   if (x > boundary) return boundary;
   return x;
