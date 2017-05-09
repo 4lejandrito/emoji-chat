@@ -51,38 +51,28 @@
 
     <script type="text/javascript">
         (function() {
+            var map = {
+                element: document.getElementById('map'),
+                addEmoji: function(emojiShortName, x, y) {
+                    var emojiElement = document.createElement('div');
+                    emojiElement.innerHTML = emojione.shortnameToUnicode(emojiShortName);
+                    emojiElement.setAttribute('class', 'emoji');
+                    emojiElement.setAttribute('data-emoji-shortname', emojiShortName);
+                    emojiElement.style.left = x + 'px';
+                    emojiElement.style.top = y + 'px';
+                    this.element.appendChild(emojiElement);
+                }
+            };
+
             function randomBetween(min, max) {
                 return Math.floor(Math.random()*(max-min+1)+min);
             }
 
-            function createEmoji(shortName) {
-                var el = document.createElement('div');
-                el.innerHTML = emojione.shortnameToUnicode(shortName);
-                el.setAttribute('class', 'emoji');
-                el.setAttribute('data-emoji-shortname', shortName);
-                return el;
-            }
-
-            function createRandomEmoji() {
-                return createEmoji(
-                    emojiShortnames[randomBetween(0, emojiShortnames.length)]
-                );
-            }
-
-            function addEmoji(parent, emojiElement, x, y) {
-                emojiElement.style.top = y + 'px';
-                emojiElement.style.left = x + 'px';
-                parent.appendChild(emojiElement);
-            }
-
-            var parent = document.getElementById('map');
-
             for (var i = 0; i < 30; i++) {
-                addEmoji(
-                    parent,
-                    createRandomEmoji(),
-                    randomBetween(0, parent.offsetWidth),
-                    randomBetween(0, parent.offsetHeight)
+                map.addEmoji(
+                    emojiShortnames[randomBetween(0, emojiShortnames.length)],
+                    randomBetween(0, map.element.offsetWidth),
+                    randomBetween(0, map.element.offsetHeight)
                 );
             }
         }());
