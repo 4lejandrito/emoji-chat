@@ -91,7 +91,7 @@
 
                 mapElement.innerHTML = '';
 
-                inputElement.onkeydown = function(e) {
+                document.onkeydown = function(e) {
                     e = e || window.event;
 
                     if (e.keyCode == '38') {
@@ -108,7 +108,7 @@
                     }
                 }
 
-                inputElement.onkeyup = function(e) {
+                document.onkeyup = function(e) {
                     e = e || window.event;
 
                     if (e.keyCode == '38') {
@@ -160,7 +160,6 @@
                 var frames = 0;
 
                 requestAnimationFrame(function loop() {
-                    // map.moveEmoji(initialData.you.emoji, speed.dx, speed.dy);
                     frames++;
 
                     if (frames % 30 == 0) {
@@ -169,7 +168,7 @@
                       var y = el.offsetHeight / factor + (emojiSize * 0.5);
                       // socket.emit('positionChanged', {x: x, y: y});
                     }
-
+                    map.moveEmoji(initialData.you.emoji, speed.dx, speed.dy);
                     requestAnimationFrame(loop);
                 });
 
