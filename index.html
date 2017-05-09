@@ -19,6 +19,12 @@
     .emoji img {
         width: 100%;
         height: 100%;
+        display: block;
+    }
+
+    .emoji.you {
+        border: solid 1px #dddddd;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
     }
 
     .bigger {
@@ -55,10 +61,10 @@
                 var map = {
                     element: mapElement,
                     emojis: {},
-                    addEmoji: function(emojiShortName, centerX, centerY) {
+                    addEmoji: function(emojiShortName, centerX, centerY, you) {
                         var emojiElement = document.createElement('div');
                         emojiElement.innerHTML = emojione.shortnameToImage(emojiShortName);
-                        emojiElement.setAttribute('class', 'emoji');
+                        emojiElement.setAttribute('class', 'emoji ' + (you ? 'you' : ''));
                         emojiElement.setAttribute('title', centerX + ', ' + centerY);
                         emojiElement.setAttribute('data-emoji-shortname', emojiShortName);
                         emojiElement.style.width = emojiSize + 'px';
@@ -178,7 +184,8 @@
                     map.addEmoji(
                         user.emoji,
                         user.position.x,
-                        user.position.y
+                        user.position.y,
+                        user.id === initialData.you.id
                     );
                 }
             });
